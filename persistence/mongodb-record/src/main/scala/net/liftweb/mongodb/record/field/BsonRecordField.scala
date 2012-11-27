@@ -32,20 +32,21 @@ import scala.xml._
 
 /** Field that contains an entire record represented as an inline object value. Inspired by JSONSubRecordField */
 class BsonRecordField[OwnerType <: BsonRecord[OwnerType], SubRecordType <: BsonRecord[SubRecordType]]
-                        (rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(implicit subRecordType: Manifest[SubRecordType])
+(rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(implicit subRecordType: Manifest[SubRecordType])
   extends Field[SubRecordType, OwnerType]
   with MandatoryTypedField[SubRecordType]
+  with LifecycleCallbacks
 {
   def this(rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType], value: SubRecordType)
           (implicit subRecordType: Manifest[SubRecordType]) = {
-      this(rec, value.meta)
-      set(value)
+    this(rec, value.meta)
+    set(value)
   }
 
   def this(rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType], value: Box[SubRecordType])
           (implicit subRecordType: Manifest[SubRecordType]) = {
-      this(rec, valueMeta)
-      setBox(value)
+    this(rec, valueMeta)
+    setBox(value)
   }
 
   def owner = rec
@@ -70,14 +71,29 @@ class BsonRecordField[OwnerType <: BsonRecord[OwnerType], SubRecordType <: BsonR
     case JNothing|JNull if optional_? => setBox(Empty)
     case _ => setBox(valueMeta.fromJValue(jvalue))
   }
+
+  //Lifecycle Callbacks to the record
+  override def beforeValidation { get.meta.foreachCallback( get, _.beforeValidation ) }
+  override def afterValidation { get.meta.foreachCallback( get, _.afterValidation ) }
+
+  override def beforeSave { get.meta.foreachCallback( get, _.beforeSave ) }
+  override def beforeCreate { get.meta.foreachCallback( get, _.beforeCreate ) }
+  override def beforeUpdate { get.meta.foreachCallback( get, _.beforeUpdate ) }
+
+  override def afterSave { get.meta.foreachCallback( get, _.afterSave ) }
+  override def afterCreate { get.meta.foreachCallback( get, _.afterCreate ) }
+  override def afterUpdate { get.meta.foreachCallback( get, _.afterUpdate ) }
+
+  override def beforeDelete { get.meta.foreachCallback( get, _.beforeDelete ) }
+  override def afterDelete { get.meta.foreachCallback( get, _.afterDelete ) }
 }
 
 /*
  * List of BsonRecords
  */
 class BsonRecordListField[OwnerType <: BsonRecord[OwnerType], SubRecordType <: BsonRecord[SubRecordType]]
-  (rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(implicit mf: Manifest[SubRecordType])
-  extends MongoListField[OwnerType, SubRecordType](rec: OwnerType) {
+(rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(implicit mf: Manifest[SubRecordType])
+  extends MongoListField[OwnerType, SubRecordType](rec: OwnerType) with LifecycleCallbacks {
 
   import scala.collection.JavaConversions._
 
@@ -101,4 +117,20 @@ class BsonRecordListField[OwnerType <: BsonRecord[OwnerType], SubRecordType <: B
     })))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }
+
+
+  //Lifecycle Callbacks to each record
+  override def beforeValidation { get.foreach(  rec => rec.meta.foreachCallback( rec, _.beforeValidation ) ) }
+  override def afterValidation { get.foreach(  rec => rec.meta.foreachCallback( rec, _.afterValidation ) ) }
+
+  override def beforeSave { get.foreach(  rec => rec.meta.foreachCallback( rec, _.beforeSave ) ) }
+  override def beforeCreate { get.foreach(  rec => rec.meta.foreachCallback( rec, _.beforeCreate ) ) }
+  override def beforeUpdate { get.foreach(  rec => rec.meta.foreachCallback( rec, _.beforeUpdate ) ) }
+
+  override def afterSave { get.foreach(  rec => rec.meta.foreachCallback( rec, _.afterSave ) ) }
+  override def afterCreate { get.foreach(  rec => rec.meta.foreachCallback( rec, _.afterCreate ) ) }
+  override def afterUpdate { get.foreach(  rec => rec.meta.foreachCallback( rec, _.afterUpdate ) ) }
+
+  override def beforeDelete { get.foreach( rec => rec.meta.foreachCallback( rec, _.beforeDelete ) ) }
+  override def afterDelete { get.foreach( rec => rec.meta.foreachCallback( rec, _.afterDelete ) ) }
 }
