@@ -377,7 +377,7 @@ trait SHtml {
   }
 
   /**
-   * Create an Ajax buttun that when it's pressed it submits an Ajax request and expects back a JSON
+   * Create an Ajax button that when pressed, submits an Ajax request and expects back a JSON
    * construct which will be passed to the <i>success</i> function
    *
    * @param text -- the name/text of the button
@@ -395,7 +395,7 @@ trait SHtml {
   }
 
   /**
-   * Create an Ajax button. When it's pressed, the function is executed
+   * Create an Ajax button that when pressed, executes the function
    *
    * @param text -- the name/text of the button
    * @param func -- the function to execute when the button is pushed.  Return Noop if nothing changes on the browser.
@@ -410,7 +410,7 @@ trait SHtml {
   }
 
   /**
-   * Create an Ajax buttun that when it's pressed it submits an Ajax request and expects back a JSON
+   * Create an Ajax button that when pressed, submits an Ajax request and expects back a JSON
    * construct which will be passed to the <i>success</i> function
    *
    * @param text -- the name/text of the button
@@ -428,7 +428,7 @@ trait SHtml {
   }
 
   /**
-   * Create an Ajax button. When it's pressed, the function is executed
+   * Create an Ajax button that when pressed, executes the function
    *
    * @param text -- the name/text of the button
    * @param jsFunc -- the user function that will be executed. This function will receive as last parameter
@@ -444,7 +444,7 @@ trait SHtml {
   }
 
   /**
-   * Create an Ajax button. When it's pressed, the function is executed
+   * Create an Ajax button that when pressed, executes the function
    *
    * @param text -- the name/text of the button
    * @param jsFunc -- the user function that will be executed. This function will receive as last parameter
@@ -458,7 +458,7 @@ trait SHtml {
     ajaxButton(Text(text), func, attrs: _*)
 
   /**
-   * Create an Ajax button. When it's pressed, the function is executed
+   * Create an Ajax button that when pressed, executes the function
    *
    * @param text -- the name/text of the button
    * @param func -- the function to execute when the button is pushed.  Return Noop if nothing changes on the browser.
@@ -610,7 +610,7 @@ trait SHtml {
   }
 
   /**
-   * This function does not really submit a JSON request to server instead json is a function
+   * This function does not really submit a JSON request to the server. Instead, json is a function
    * that allows you to build a more complex JsCmd based on the JsExp <i>JE.JsRaw("this.value")</i>.
    * This function is called by the overloaded version of jsonText.
    *
@@ -630,7 +630,7 @@ trait SHtml {
 
 
   /**
-   * This function does not really submit a JSON request to server instead json is a function
+   * This function does not really submit a JSON request to the server. Instead, json is a function
    * that allows you to build a more complex JsCmd based on the JsExp <i>JE.JsRaw("this.value")</i>.
    * This function is called by the overloaded version of jsonText.
    *
@@ -690,7 +690,7 @@ trait SHtml {
   }
 
   /**
-   * This function does not really submit a JSON request to server instead json is a function
+   * This function does not really submit a JSON request to the server. Instead, json is a function
    * that allows you to build a more complex JsCmd based on the JsExp <i>JE.JsRaw("this.value")</i>.
    * This function is called by the overloaded version of jsonTextarea.
    *
@@ -1181,7 +1181,7 @@ trait SHtml {
   }
 
   /**
-   * execute the function when the form is submitted.
+   * Execute the function when the form is submitted.
    * This method returns a function that can be applied to
    * form fields (input, button, textarea, select) and the
    * function is executed when the form containing the field is submitted.
@@ -1190,7 +1190,7 @@ trait SHtml {
     onSubmitImpl(func: AFuncHolder)
 
   /**
-   * execute the String function when the form is submitted.
+   * Execute the String function when the form is submitted.
    * This method returns a function that can be applied to
    * form fields (input, button, textarea, select) and the
    * function is executed when the form containing the field is submitted.
@@ -1200,7 +1200,7 @@ trait SHtml {
   }
 
   /**
-   * execute the List[String] function when the form is submitted.
+   * Execute the List[String] function when the form is submitted.
    * This method returns a function that can be applied to
    * form fields (input, button, textarea, select) and the
    * function is executed when the form containing the field is submitted.

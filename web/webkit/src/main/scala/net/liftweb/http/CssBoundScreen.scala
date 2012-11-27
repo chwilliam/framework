@@ -102,7 +102,7 @@ trait CssBoundScreen extends ScreenWizardRendered with Loggable {
   }
 
   protected def setLocalAction(s: String) {
-    logger.debug("Setting LocalAction (%s) to %s".format(
+    logger.trace("Setting LocalAction (%s) to %s".format(
       Integer.toString(System.identityHashCode(LocalAction), 16), s))
     LocalAction.set(s)
   }
@@ -163,9 +163,20 @@ trait CssBoundScreen extends ScreenWizardRendered with Loggable {
       } yield traceInline("Binding custom field %s to %s".format(bindingInfo.selector(formName), custom.template),
         bindingInfo.selector(formName) #> bindField(field)(custom.template))
 
+    def dynamicFields: List[CssBindFunc] =
+      for {
+        field <- fields
+        bindingInfo <- field.binding
+        dynamic <- Some(bindingInfo.bindingStyle) collect { case d:Dynamic => d }
+      } yield {
+        val template = dynamic.func()
+        traceInline("Binding dynamic field %s to %s".format(bindingInfo.selector(formName), template),
+          bindingInfo.selector(formName) #> bindField(field)(template))
+      }
+
     def bindFields: CssBindFunc = {
       logger.trace("Binding fields", fields)
-      List(templateFields, selfFields, defaultFields, customFields).flatten.reduceLeft(_ & _)
+      List(templateFields, selfFields, defaultFields, customFields, dynamicFields).flatten.reduceLeft(_ & _)
     }
 
     def bindField(f: ScreenFieldInfo): NodeSeq => NodeSeq = {
@@ -221,7 +232,10 @@ trait CssBoundScreen extends ScreenWizardRendered with Loggable {
 
       def bindAll() = bindLabel() & bindForm() & bindHelp() & bindErrors()
 
-      f.transform map (func => bindAll() andThen func()) openOr (bindAll())
+      if (f.transforms.isEmpty)
+        bindAll()
+      else
+        (bindAll() :: f.transforms.map(_ apply (f.field))).reduceLeft(_ andThen _)
     }
 
     def url = S.uri
