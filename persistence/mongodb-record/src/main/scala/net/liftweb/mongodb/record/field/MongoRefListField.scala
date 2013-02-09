@@ -20,6 +20,7 @@ package record
 package field
 
 import common._
+import json._
 import http.{S, SHtml}
 import net.liftweb.record.{Field, MandatoryTypedField, TypedField}
 
@@ -75,12 +76,21 @@ abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: 
 
 class ObjectIdRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, ObjectId](rec) {}
+) extends MongoRefListField[OwnerType, RefType, ObjectId](rec)
+{
+
+  override def valueFromJValue(value : JValue) : ObjectId = new ObjectId(value.values.toString)
+
+}
 
 class UUIDRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, UUID](rec) {}
+) extends MongoRefListField[OwnerType, RefType, UUID](rec)
+{
 
+  override def valueFromJValue(value : JValue) : UUID = UUID.fromString( value.values.toString )
+
+}
 class StringRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
 ) extends MongoRefListField[OwnerType, RefType, String](rec) {}
