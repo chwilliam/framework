@@ -71,9 +71,13 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](rec
     }
   }
 
+
+  //Converts an individual JValue into the list type
+  def valueFromJValue(value : JValue) : ListType = value.values.asInstanceOf[ListType]
+
   def setFromJValue(jvalue: JValue) = jvalue match {
     case JNothing|JNull if optional_? => setBox(Empty)
-    case JArray(arr) => setBox(Full(arr.map(_.values.asInstanceOf[ListType])))
+    case JArray(arr) => setBox(Full(arr.map( aValue => valueFromJValue( aValue )  )))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }
 
