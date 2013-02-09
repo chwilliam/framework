@@ -277,7 +277,7 @@ object ListTestRecord extends ListTestRecord with MongoMetaRecord[ListTestRecord
   override def formats = allFormats + new EnumSerializer(MyTestEnum)
 }
 
-class FieldListTestRecord private () extends MongoRecord[FieldListTestRecord] with UUIDPk[FieldListTestRecord] {
+class FieldListTestRecord private () extends MongoRecord[FieldListTestRecord] with ObjectIdPk[FieldListTestRecord] {
   def meta = FieldListTestRecord
 
   object mandatoryStringListField extends MongoFieldList(this, new StringField(this, Int.MaxValue))
@@ -290,9 +290,12 @@ class FieldListTestRecord private () extends MongoRecord[FieldListTestRecord] wi
   // TODO: More List types
 
   def dirtyFields = this.allFields.filter(_.dirty_?)
+
+  object mandatoryObjectIdRefListField extends ObjectIdRefListField(this, FieldListTestRecord)
+
 }
 object FieldListTestRecord extends FieldListTestRecord with MongoMetaRecord[FieldListTestRecord] {
-  override def formats = allFormats + new EnumSerializer(MyTestEnum)
+  override def formats = DefaultFormats + new EnumSerializer(MyTestEnum)
 }
 
 class MapTestRecord private () extends MongoRecord[MapTestRecord] with StringPk[MapTestRecord] {

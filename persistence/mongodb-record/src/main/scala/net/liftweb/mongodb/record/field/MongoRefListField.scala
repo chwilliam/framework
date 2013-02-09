@@ -26,6 +26,7 @@ import net.liftweb.record.{Field, MandatoryTypedField, TypedField}
 import java.util.UUID
 
 import org.bson.types.ObjectId
+import net.liftweb.record.field._
 
 /*
  * Trait for creating a Field for storing a list of "foreign keys". Caches the
@@ -35,8 +36,9 @@ import org.bson.types.ObjectId
  * toForm produces a multi-select form element. You just need to supply the
  * options by overriding the options method.
  */
-abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType], MyType]
-  (rec: OwnerType)(implicit mf: Manifest[MyType]) extends MongoListField[OwnerType, MyType](rec) {
+abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType], RefFormat]
+  (rec: OwnerType, refField : Field[RefFormat, OwnerType] )(implicit mf: Manifest[RefFormat]) extends MongoFieldList[OwnerType, RefFormat](rec, refField)
+{
 
   /** The MongoMetaRecord of the referenced object **/
   def refMeta: MongoMetaRecord[RefType]
@@ -75,20 +77,20 @@ abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: 
 
 class ObjectIdRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, ObjectId](rec) {}
+) extends MongoRefListField[OwnerType, RefType, ObjectId](rec, new ObjectIdField(rec)) {}
 
 class UUIDRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, UUID](rec) {}
+) extends MongoRefListField[OwnerType, RefType, UUID](rec, new UUIDField(rec)) {}
 
 class StringRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, String](rec) {}
+) extends MongoRefListField[OwnerType, RefType, String](rec, new StringField(rec, Int.MaxValue)) {}
 
 class IntRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, Int](rec) {}
+) extends MongoRefListField[OwnerType, RefType, Int](rec, new IntField(rec)) {}
 
 class LongRefListField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
   rec: OwnerType, val refMeta: MongoMetaRecord[RefType]
-) extends MongoRefListField[OwnerType, RefType, Long](rec) {}
+) extends MongoRefListField[OwnerType, RefType, Long](rec, new LongField(rec)) {}

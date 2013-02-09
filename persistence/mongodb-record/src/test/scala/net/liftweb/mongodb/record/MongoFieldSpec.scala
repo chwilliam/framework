@@ -376,6 +376,22 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundExample
     }
   }
 
+  "ObjectIdRefListField" should {
+    "function correctly" in {
+      val rec = FieldListTestRecord.createRecord
+      val lst = List(new ObjectId("4e833b9fd4abb925eb000182"), new ObjectId("4e833b9fd4abb925eb000183"))
+      val lst2 = List(new ObjectId("4e833b9fd4abb925eb000184"), new ObjectId("4e833b9fd4abb925eb000185"))
+      passBasicTests(lst, lst2, rec.mandatoryObjectIdRefListField, Empty)
+      passConversionTests(
+        lst,
+        rec.mandatoryObjectIdRefListField,
+        JsArray(Str("{4e833b9fd4abb925eb000182"), Str("4e833b9fd4abb925eb000183")),
+        JArray(List(JString("4e833b9fd4abb925eb000182"), JString("4e833b9fd4abb925eb000183") )),
+        Empty
+      )
+    }
+  }
+
   "MongoJsonObjectListField" should {
     "function correctly" in {
       val rec = ListTestRecord.createRecord
