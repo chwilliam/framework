@@ -328,6 +328,22 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundExample
     }
   }
 
+  "MongoFieldList (String)" should {
+    "function correctly" in {
+      val rec = FieldListTestRecord.createRecord
+      val lst = List("abc", "def", "ghi")
+      val lst2 = List("ab", "de", "gh")
+      passBasicTests(lst, lst2, rec.mandatoryStringListField, Empty)
+      passConversionTests(
+        lst,
+        rec.mandatoryStringListField,
+        JsArray(Str("abc"), Str("def"), Str("ghi")),
+        JArray(List(JString("abc"), JString("def"), JString("ghi"))),
+        Empty
+      )
+    }
+  }
+
   "MongoListField (Int)" should {
     "function correctly" in {
       val rec = ListTestRecord.createRecord
@@ -344,9 +360,47 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundExample
     }
   }
 
+  "MongoFieldList (Int)" should {
+    "function correctly" in {
+      val rec = FieldListTestRecord.createRecord
+      val lst = List(4, 5, 6)
+      val lst2 = List(1, 2, 3)
+      passBasicTests(lst, lst2, rec.mandatoryIntListField, Empty)
+      passConversionTests(
+        lst,
+        rec.mandatoryIntListField,
+        JsArray(Num(4), Num(5), Num(6)),
+        JArray(List(JInt(4), JInt(5), JInt(6))),
+        Empty
+      )
+    }
+  }
+
   "MongoJsonObjectListField" should {
     "function correctly" in {
       val rec = ListTestRecord.createRecord
+      val lst = List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")), TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2")))
+      val lst2 = List(TypeTestJsonObject(3, "jsonobj3", Map("x" -> "3")), TypeTestJsonObject(4, "jsonobj4", Map("x" -> "4")))
+      val json = List(
+        ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~ ("mapField" -> (("x" -> "1"))),
+        ("intField" -> 2) ~ ("stringField" -> "jsonobj2") ~ ("mapField" -> (("x" -> "2")))
+      )
+      passBasicTests(lst, lst2, rec.mandatoryMongoJsonObjectListField, Empty)
+      passConversionTests(
+        lst,
+        rec.mandatoryMongoJsonObjectListField,
+        new JsExp {
+          def toJsCmd = Printer.compact(render(json))
+        },
+        json,
+        Empty
+      )
+    }
+  }
+
+  "MongoFieldList (JsonObjectField)" should {
+    "function correctly" in {
+      val rec = FieldListTestRecord.createRecord
       val lst = List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")), TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2")))
       val lst2 = List(TypeTestJsonObject(3, "jsonobj3", Map("x" -> "3")), TypeTestJsonObject(4, "jsonobj4", Map("x" -> "4")))
       val json = List(
